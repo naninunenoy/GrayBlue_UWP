@@ -9,15 +9,13 @@ using System.Reactive.Subjects;
 using System.Reactive.Disposables;
 using Windows.Devices.Bluetooth.Advertisement;
 
-namespace IMUOberverCore {
-    public class IMUOberverCore : IDisposable {
-        public string Hello { get { return "Hello IMUOberverCore."; } }
-
+namespace IMUOberverCore.BLE {
+    class AdvertiseObserver : IDisposable {
         const int advertiseImtervalMS = 3000;
         private BluetoothLEAdvertisementWatcher advertiseWatcher;
         private Subject<BluetoothLEAdvertisement> advertiseSubject;
 
-        public IMUOberverCore() {
+        public AdvertiseObserver() {
             advertiseWatcher = new BluetoothLEAdvertisementWatcher();
             advertiseSubject = new Subject<BluetoothLEAdvertisement>();
             advertiseWatcher.SignalStrengthFilter.SamplingInterval = TimeSpan.FromMilliseconds(advertiseImtervalMS);
