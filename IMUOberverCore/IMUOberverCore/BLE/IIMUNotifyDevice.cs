@@ -2,7 +2,7 @@
 using Windows.Devices.Bluetooth;
 
 namespace IMUOberverCore.BLE {
-    interface IIMUNotifyDevice : IDisposable {
+    internal interface IIMUNotifyDevice : IDisposable {
         BluetoothLEDevice Divice { get; }
         string UUID { get; }
         IObservable<byte[]> ButtonUpdateObservable();

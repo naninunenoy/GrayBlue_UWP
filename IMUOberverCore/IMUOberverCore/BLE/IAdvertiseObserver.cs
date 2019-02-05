@@ -1,8 +1,9 @@
 ﻿using System;
-using Windows.Devices.Bluetooth.Advertisement;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
 
 namespace IMUOberverCore.BLE {
-    interface IAdvertiseObserver : IDisposable {
-        IObservable<BluetoothLEAdvertisementReceivedEventArgs> ScanAdvertiseDevicesAsync();
+    internal interface IAdvertiseObserver : IDisposable {
+        Task<BluetoothLEDevice[]> ScanAdvertiseDevicesAsync();
     }
 }
