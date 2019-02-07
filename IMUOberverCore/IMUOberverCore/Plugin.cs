@@ -15,13 +15,13 @@ namespace IMUOberverCore {
 
         public static async Task<string[]> Scan() {
             var devices = await advertiseObserver.ScanAdvertiseDevicesAsync();
-            if (devices != null || devices.Length == 0) {
+            if (devices == null || devices.Length == 0) {
                 Debug.WriteLine("no device found..");
                 return new string[0]; //empty
             }
             Debug.WriteLine($"found {devices.Length} devices");
-            Debug.WriteLine($"DeviceId: {string.Join("/", devices.Select(x => x.DeviceId))}");
-            Debug.WriteLine($"BluetoothDeviceId: {string.Join("/", devices.Select(x => x.BluetoothDeviceId))}");
+            Debug.WriteLine($"DeviceId: {string.Join("/", devices.Select(x => x.DeviceId.ToString()))}");
+            Debug.WriteLine($"BluetoothDeviceId: {string.Join("/", devices.Select(x => x.BluetoothDeviceId.Id.ToUpper()))}");
             Debug.WriteLine($"BluetoothAddress :{string.Join("/", devices.Select(x => x.BluetoothAddress))}");
             return devices.Select(x => x.DeviceId).ToArray();
         }

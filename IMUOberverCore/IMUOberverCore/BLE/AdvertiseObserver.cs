@@ -13,7 +13,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace IMUOberverCore.BLE {
     internal class AdvertiseObserver : IAdvertiseObserver {
-        static readonly TimeSpan interval = TimeSpan.FromMilliseconds(500);
+        static readonly TimeSpan interval = TimeSpan.FromMilliseconds(2000);
         static readonly TimeSpan scanLength = TimeSpan.FromSeconds(5);
 
         private readonly BluetoothLEAdvertisementWatcher advertiseWatcher;
@@ -34,8 +34,10 @@ namespace IMUOberverCore.BLE {
 
         public async Task<BluetoothLEDevice[]> ScanAdvertiseDevicesAsync() {
             Debug.WriteLine("ScanAdvertiseDevicesAsync");
+            advertiseWatcher.Start();
             return await advertiseSubject
-                .TakeUntil(new DateTimeOffset(DateTime.Now, scanLength))
+                .TakeUntil(DateTimeOffset.Now.Add(scanLength))
+                .Finally(advertiseWatcher.Stop)
                 .Select(async arg => {
                     var device = await BluetoothLEDevice.FromBluetoothAddressAsync(arg.BluetoothAddress);
                     var gatt = await device.GetGattServicesAsync();
@@ -46,11 +48,13 @@ namespace IMUOberverCore.BLE {
                 .Select(task => task.Result)
                 .Where(x => x.isMyService)
                 .Select(x => x.device)
+                .Distinct()
                 .ToArray()
                 .ToTask();
         }
 
         private void OnAdvertisementReceived(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args) {
+            Debug.WriteLine($"OnAdvertisementReceived {args.BluetoothAddress}");
             if (sender == advertiseWatcher) {
                 advertiseSubject.OnNext(args);
             }
