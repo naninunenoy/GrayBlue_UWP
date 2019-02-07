@@ -11,7 +11,8 @@ namespace IMUObserverCore.BLE {
         }
 
         public static class Characteristics {
-            public const string ButtonOperation = "de4c4016-26ea-11e9-ab14-d663bd873d93";
+            const string buttonOperation = "de4c4016-26ea-11e9-ab14-d663bd873d93";
+            public static readonly Guid ButtonOperation = new Guid(buttonOperation);
         }
     }
 }
