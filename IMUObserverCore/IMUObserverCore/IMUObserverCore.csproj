@@ -123,8 +123,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BLE\AdvertiseObserver.cs" />
+    <Compile Include="BLE\GattDevice.cs" />
     <Compile Include="BLE\IAdvertiseObserver.cs" />
+    <Compile Include="BLE\IGattDevice.cs" />
     <Compile Include="BLE\IIMUNotifyDevice.cs" />
+    <Compile Include="BLE\IMUDevice.cs" />
     <Compile Include="BLE\Profiles.cs" />
     <Compile Include="IConnectionDelegate.cs" />
     <Compile Include="INotifyDelegate.cs" />

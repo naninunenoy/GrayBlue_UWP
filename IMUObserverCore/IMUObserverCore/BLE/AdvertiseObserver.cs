@@ -13,8 +13,8 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace IMUObserverCore.BLE {
     internal class AdvertiseObserver : IAdvertiseObserver {
-        static readonly TimeSpan interval = TimeSpan.FromMilliseconds(2000);
-        static readonly TimeSpan scanLength = TimeSpan.FromSeconds(5);
+        static readonly TimeSpan interval = TimeSpan.FromSeconds(1);
+        static readonly TimeSpan scanLength = TimeSpan.FromSeconds(3);
 
         private readonly BluetoothLEAdvertisementWatcher advertiseWatcher;
         private readonly Subject<BluetoothLEAdvertisementReceivedEventArgs> advertiseSubject;
@@ -32,23 +32,23 @@ namespace IMUObserverCore.BLE {
             advertiseSubject.Dispose();
         }
 
-        public async Task<BluetoothLEDevice[]> ScanAdvertiseDevicesAsync() {
+        public async Task<IGattDevice[]> ScanAdvertiseDevicesAsync() {
             Debug.WriteLine("ScanAdvertiseDevicesAsync");
             advertiseWatcher.Start();
             return await advertiseSubject
                 .TakeUntil(DateTimeOffset.Now.Add(scanLength))
                 .Finally(advertiseWatcher.Stop)
                 .Select(async arg => {
-                    var device = await BluetoothLEDevice.FromBluetoothAddressAsync(arg.BluetoothAddress);
-                    var gatt = await device.GetGattServicesAsync();
-                    var isMyService = gatt.ContainsServiceUuid(Profiles.Services.Button);
-                    Debug.WriteLine($"{device.Name}'s services are {gatt.ServiceUuids()}");
+                    var device = new GattDevice(arg.BluetoothAddress);
+                    await device.LoadAsync();
+                    var isMyService = device.GattServices.ContainsServiceUuid(Profiles.Services.Button);
+                    Debug.WriteLine($"{device.Name}'s services are {device.GattServices.ServiceUuids()}");
                     return new { isMyService, device };
                 })
                 .Select(task => task.Result)
                 .Where(x => x.isMyService)
                 .Select(x => x.device)
-                .Distinct()
+                .Distinct(x => x.UUID)
                 .ToArray()
                 .ToTask();
         }
@@ -58,17 +58,6 @@ namespace IMUObserverCore.BLE {
             if (sender == advertiseWatcher) {
                 advertiseSubject.OnNext(args);
             }
-        }
-    }
-
-    internal static class GattDeviceServiceExtension {
-        public static bool ContainsServiceUuid(this GattDeviceServicesResult gatt, string uuid) {
-            return gatt.Services.Any(x => uuid == x.Uuid.ToString());
-        }
-        public static string ServiceUuids(this GattDeviceServicesResult gatt) {
-            if (gatt == null || gatt.Services == null) return "<NULL>";
-            if (!gatt.Services.Any()) return "<EMPTY>";
-            return $"<{string.Join(",", gatt.Services.Select(x => x.Uuid.ToString()))}>";
         }
     }
 }

@@ -20,10 +20,9 @@ namespace IMUObserverCore {
                 return new string[0]; //empty
             }
             Debug.WriteLine($"found {devices.Length} devices");
-            Debug.WriteLine($"DeviceId: {string.Join("/", devices.Select(x => x.DeviceId.ToString()))}");
-            Debug.WriteLine($"BluetoothDeviceId: {string.Join("/", devices.Select(x => x.BluetoothDeviceId.Id.ToUpper()))}");
-            Debug.WriteLine($"BluetoothAddress :{string.Join("/", devices.Select(x => x.BluetoothAddress))}");
-            return devices.Select(x => x.DeviceId).ToArray();
+            Debug.WriteLine($"DeviceId: {string.Join("/", devices.Select(x => x.UUID.ToString()))}");
+            Debug.WriteLine($"BluetoothAddress :{string.Join("/", devices.Select(x => x.Address))}");
+            return devices.Select(x => x.UUID).ToArray();
         }
     }
 }
