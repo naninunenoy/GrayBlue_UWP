@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -13,17 +15,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using System.Diagnostics;
-using IMUOberverCore;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reactive.Disposables;
-using Windows.Devices.Bluetooth;
-
-using Windows.Devices.Bluetooth.Advertisement;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -37,31 +28,12 @@ namespace IMUObserverApp {
             this.InitializeComponent();
             Debug.WriteLine("MainPage");
 
-            var core = new IMUOberverCore.IMUOberverCore();
-            core.AdvertiseAsync()
-                .Subscribe(x => {
-                    Debug.WriteLine(x.LocalName + " " + x.ServiceUuids[0]);
-                });
-            var BleWatcher = new BluetoothLEAdvertisementWatcher {
-                ScanningMode = BluetoothLEScanningMode.Active
-            };
+            var blescan = IMUObserverCore.Plugin.Scan();
 
-            BleWatcher.Received += async (w, btAdv) => {
-                var device = await BluetoothLEDevice.FromBluetoothAddressAsync(btAdv.BluetoothAddress);
-                Debug.WriteLine($"BLEWATCHER Found: {device.Name}");
-
-                // SERVICES!!
-                var gatt = await device.GetGattServicesAsync();
-                Debug.WriteLine($"{device.Name} Services: {gatt.Services.Count}, {gatt.Status}, {gatt.ProtocolError}");
-
-                // CHARACTERISTICS!!
-                //var characs = await gatt.Services.Single(s => s.Uuid == SAMPLESERVICEUUID).GetCharacteristicsAsync();
-                //var charac = characs.Single(c => c.Uuid == SAMPLECHARACUUID);
-                //await charac.WriteValueAsync(SOMEDATA);
-            };
-
-            BleWatcher.Start();
-
+            Task.Run(() => {
+                var result = blescan.Result;
+                Debug.WriteLine($"found {result.Length} devices");
+            });
         }
 
     }
