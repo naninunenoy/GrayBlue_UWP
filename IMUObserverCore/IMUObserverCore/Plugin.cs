@@ -32,7 +32,30 @@ namespace IMUObserverCore {
             return devices.Select(x => x.UUID).ToArray();
         }
 
+        public static void ConnectTo(string uuid, IConnectionDelegate connectionDelegate, INotifyDelegate notifyDelegate) {
+            if (!DeviceDict.ContainsKey(uuid)) {
+                Debug.Fail($"{uuid} is not exist");
+                return;
+            }
+            var device = DeviceDict[uuid];
+            device.ButtonUpdateObservable()
+                  .Subscribe(data => {
+                      char name = (char)data[3];
+                      bool press = (data[2] != 0);
+                      short ms = (short)((data[1] << 8) & data[0]);
+                      float time = ms / 1000.0F;
+                      if (press) {
+                          notifyDelegate.OnButtonPush(uuid, name.ToString());
+                      } else {
+                          notifyDelegate.OnButtonRelease(uuid, name.ToString(), time);
+                      }
+                  });
+        }
+
         public static void Dispose() {
+            foreach(var device in DeviceDict.Values) {
+                device.Dispose();
+            }
             advertiseObserver.Dispose();
             DeviceDict.Clear();
         }

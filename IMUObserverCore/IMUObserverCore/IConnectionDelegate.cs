@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace IMUObserverCore {
-    interface IConnectionDelegate {
+    public interface IConnectionDelegate {
         void OnConnectDone(string uuid);
         void OnConnectTimeout(string uuid);
         void OnConnectLost(string uuid);

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
@@ -19,7 +20,6 @@ namespace IMUObserverCore.BLE {
         public GattDeviceServicesResult GattServices { private set; get; }
         public Dictionary<string, GattDeviceService> GattServiceDict { private set; get; }
 
-        private GattCharacteristic buttonCharacteristic;
         private Subject<byte[]> buttonSubject;
 
         public IMUDevice(IGattDevice gattDevice) {
@@ -35,19 +35,24 @@ namespace IMUObserverCore.BLE {
             if (GattServiceDict.ContainsKey(Profiles.Services.Button)) {
                 var s = GattServiceDict[Profiles.Services.Button];
                 var cs = await s.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
-                buttonCharacteristic = cs.Characteristics.FirstOrDefault();
-                buttonCharacteristic.ValueChanged += OnButtonNotify;
+                var c = cs.Characteristics.FirstOrDefault();
+                c.ValueChanged += OnButtonNotify;
+                await c.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             }
             return this;
         }
 
-        private void OnButtonNotify(GattCharacteristic c, GattValueChangedEventArgs value) {
-
+        private void OnButtonNotify(GattCharacteristic c, GattValueChangedEventArgs arg) {
+            if (c.Uuid == Profiles.Characteristics.ButtonOperation) {
+                var data = new byte[arg.CharacteristicValue.Length];
+                DataReader.FromBuffer(arg.CharacteristicValue).ReadBytes(data);
+                buttonSubject.OnNext(data);
+            }
         }
+
         public IObservable<byte[]> ButtonUpdateObservable() { return buttonSubject.AsObservable(); }
 
         public void Dispose() {
-            buttonCharacteristic.ValueChanged -= OnButtonNotify;
             buttonSubject.Dispose();
             Device.Dispose();
         }
