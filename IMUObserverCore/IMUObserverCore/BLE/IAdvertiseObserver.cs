@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 
-namespace IMUOberverCore.BLE {
+namespace IMUObserverCore.BLE {
     internal interface IAdvertiseObserver : IDisposable {
         Task<BluetoothLEDevice[]> ScanAdvertiseDevicesAsync();
     }

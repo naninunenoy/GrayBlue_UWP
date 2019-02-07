@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IMUOberverCore {
+namespace IMUObserverCore {
     interface INotifyDelegate {
         void OnButtonPush(string uuid, string buttonName);
         void OnButtonRelease(string uuid, string buttonName, float pressTime);

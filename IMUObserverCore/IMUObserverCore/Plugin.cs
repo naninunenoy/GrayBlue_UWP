@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMUOberverCore {
+namespace IMUObserverCore {
     public static class Plugin {
         static BLE.IAdvertiseObserver advertiseObserver;
 

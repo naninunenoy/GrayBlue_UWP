@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IMUOberverCore {
+namespace IMUObserverCore {
     interface IConnectionDelegate {
         void OnConnectDone(string uuid);
         void OnConnectTimeout(string uuid);

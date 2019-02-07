@@ -25,7 +25,7 @@
     にアクセスしてください。
 -->
 <Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
-  <Library Name="IMUOberverCore">
+  <Library Name="IMUObserverCore">
 
   	<!--ここにライブラリのディレクティブを追加する-->
 
