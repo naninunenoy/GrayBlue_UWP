@@ -33,11 +33,21 @@ namespace IMUObserverCore.BLE {
         public async Task<IMUDevice> LoadAsync() {
             // button operation
             if (GattServiceDict.ContainsKey(Profiles.Services.Button)) {
-                var s = GattServiceDict[Profiles.Services.Button];
-                var cs = await s.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
-                var c = cs.Characteristics.FirstOrDefault();
-                c.ValueChanged += OnButtonNotify;
-                await c.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                var sevice = GattServiceDict[Profiles.Services.Button];
+                var characteristics = await sevice.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
+                var characteristic = characteristics.Characteristics.FirstOrDefault();
+                if (characteristic == null) {
+                    throw new BLEException($"characteristic({Profiles.Characteristics.ButtonOperation}) not found");
+                }
+                if (!characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify)) {
+                    throw new BLEException($"characteristic({Profiles.Characteristics.ButtonOperation}) has no Notify flag");
+                }
+                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                Debug.WriteLine(status);
+                if (status != GattCommunicationStatus.Success) {
+                    throw new GattConnectionException("Button Operation GattCommunicationStatus is failed");
+                }
+                characteristic.ValueChanged += OnButtonNotify;
             }
             return this;
         }

@@ -123,6 +123,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BLE\AdvertiseObserver.cs" />
+    <Compile Include="BLE\BLEException.cs" />
     <Compile Include="BLE\GattDevice.cs" />
     <Compile Include="BLE\IAdvertiseObserver.cs" />
     <Compile Include="BLE\IGattDevice.cs" />

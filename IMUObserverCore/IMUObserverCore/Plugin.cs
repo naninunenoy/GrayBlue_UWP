@@ -40,10 +40,11 @@ namespace IMUObserverCore {
             var device = DeviceDict[uuid];
             device.ButtonUpdateObservable()
                   .Subscribe(data => {
-                      char name = (char)data[3];
-                      bool press = (data[2] != 0);
-                      short ms = (short)((data[1] << 8) & data[0]);
+                      bool press = (data[0] != 0);
+                      char name = (char)data[1];
+                      short ms = (short)((data[3] << 8) + data[2]);
                       float time = ms / 1000.0F;
+                      Debug.WriteLine($"p={press},c={name},t={time}");
                       if (press) {
                           notifyDelegate.OnButtonPush(uuid, name.ToString());
                       } else {
