@@ -19,22 +19,46 @@ using Windows.UI.Xaml.Navigation;
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
 namespace IMUObserverApp {
+    using Core = IMUObserverCore;
     /// <summary>
     /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
     /// </summary>
-    public sealed partial class MainPage : Page {
+    public sealed partial class MainPage : Page, Core.IConnectionDelegate, Core.INotifyDelegate {
 
         public MainPage() {
             this.InitializeComponent();
             Debug.WriteLine("MainPage");
 
-            var blescan = IMUObserverCore.Plugin.Scan();
+            var blescan = Core.Plugin.Scan();
 
-            Task.Run(() => {
-                var result = blescan.Result;
-                Debug.WriteLine($"found {result.Length} devices");
+            Task.Run(async () => {
+                var result = await blescan;
+                Debug.WriteLine($"found {result.Length} devices. {string.Join(",", result)}");
+                if (result.Length > 0) {
+                    var uuid = result[0];
+                    Core.Plugin.ConnectTo(uuid, this, this);
+                }
             });
         }
 
+        public void OnButtonPush(string uuid, string buttonName) {
+            Debug.WriteLine($"push {buttonName} {uuid}");
+        }
+
+        public void OnButtonRelease(string uuid, string buttonName, float pressTime) {
+            Debug.WriteLine($"release {buttonName} {pressTime} {uuid}");
+        }
+
+        public void OnConnectDone(string uuid) {
+            //throw new NotImplementedException();
+        }
+
+        public void OnConnectLost(string uuid) {
+            //throw new NotImplementedException();
+        }
+
+        public void OnConnectTimeout(string uuid) {
+            //throw new NotImplementedException();
+        }
     }
 }
