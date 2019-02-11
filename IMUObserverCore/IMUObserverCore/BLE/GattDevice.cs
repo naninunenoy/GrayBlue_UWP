@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +24,7 @@ namespace IMUObserverCore.BLE {
             GattServiceDict.Clear();
             Device = await BluetoothLEDevice.FromBluetoothAddressAsync(Address);
             GattServices = await Device.GetGattServicesAsync();
-            foreach(var service in GattServices.Services) {
+            foreach (var service in GattServices.Services) {
                 GattServiceDict.Add(service.Uuid.ToString(), service);
             }
             return this;

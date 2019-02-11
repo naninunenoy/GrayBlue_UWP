@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace IMUObserverCore {
             Debug.WriteLine($"found {devices.Length} devices");
             Debug.WriteLine($"DeviceId: {string.Join("/", devices.Select(x => x.UUID.ToString()))}");
             Debug.WriteLine($"BluetoothAddress :{string.Join("/", devices.Select(x => x.Address))}");
-            foreach(var device in devices) {
+            foreach (var device in devices) {
                 if (!DeviceDict.ContainsKey(device.UUID)) {
                     DeviceDict.Add(device.UUID, device);
                 }
@@ -53,7 +53,7 @@ namespace IMUObserverCore {
         }
 
         public static void Dispose() {
-            foreach(var device in DeviceDict.Values) {
+            foreach (var device in DeviceDict.Values) {
                 device.Dispose();
             }
             advertiseObserver.Dispose();
