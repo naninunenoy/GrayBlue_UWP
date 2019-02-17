@@ -38,18 +38,18 @@ namespace IMUObserverCore.BLE {
             return await advertiseSubject
                 .TakeUntil(DateTimeOffset.Now.Add(scanLength))
                 .Finally(advertiseWatcher.Stop)
-                .Select(async arg => {
-                    var device = await new GattDevice(arg.BluetoothAddress).LoadAsync();
-                    var isMyService = device.GattServices.ContainsServiceUuid(Profiles.Services.Button);
-                    Debug.WriteLine($"{device.Name}'s services are {device.GattServices.ServiceUuids()}");
-                    return new { isMyService, device };
+                .Select(async arg => { return await new GattDevice(arg.BluetoothAddress).LoadAsync(); })
+                .Select(task => task.Result)
+                .Where(x => {
+                    if (x.GattServices.ContainsServiceUuid(Profiles.Services.Button)) {
+                        return true;
+                    } else {
+                        x.Dispose();
+                        return false;
+                    }
                 })
-                .Select(task => task.Result)
-                .Where(x => x.isMyService)
-                .Select(x => x.device)
                 .Distinct(x => x.UUID)
-                .Select(async x => await new IMUDevice(x).LoadAsync())
-                .Select(task => task.Result)
+                .Select(x => new IMUDevice(x))
                 .ToArray()
                 .ToTask();
         }

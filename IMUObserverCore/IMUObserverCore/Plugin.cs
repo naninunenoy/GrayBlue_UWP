@@ -32,12 +32,20 @@ namespace IMUObserverCore {
             return devices.Select(x => x.UUID).ToArray();
         }
 
-        public static void ConnectTo(string uuid, IConnectionDelegate connectionDelegate, INotifyDelegate notifyDelegate) {
+        public static async Task<bool> ConnectTo(string uuid, IConnectionDelegate connectionDelegate, INotifyDelegate notifyDelegate) {
             if (!DeviceDict.ContainsKey(uuid)) {
                 Debug.Fail($"{uuid} is not exist");
-                return;
+                return false;
             }
             var device = DeviceDict[uuid];
+            try {
+                device = await device.ConnectionAsync();
+            } catch (BLE.BLEException) {
+                connectionDelegate.OnConnectFail(uuid);
+                return false;
+            }
+            device.ConnectionLostObservable()
+                  .Subscribe(_ => { connectionDelegate?.OnConnectLost(uuid); });
             device.ButtonUpdateObservable()
                   .Subscribe(data => {
                       bool press = (data[0] != 0);
@@ -46,11 +54,29 @@ namespace IMUObserverCore {
                       float time = ms / 1000.0F;
                       Debug.WriteLine($"p={press},c={name},t={time}");
                       if (press) {
-                          notifyDelegate.OnButtonPush(uuid, name.ToString());
+                          notifyDelegate?.OnButtonPush(uuid, name.ToString());
                       } else {
-                          notifyDelegate.OnButtonRelease(uuid, name.ToString(), time);
+                          notifyDelegate?.OnButtonRelease(uuid, name.ToString(), time);
                       }
                   });
+            connectionDelegate.OnConnectDone(uuid);
+            return true;
+        }
+
+        public static void DissconnectTo(string uuid) {
+            if (!DeviceDict.ContainsKey(uuid)) {
+                Debug.Fail($"{uuid} is not exist");
+                return;
+            }
+            DeviceDict[uuid].Disconnect();
+            DeviceDict.Remove(uuid);
+        }
+
+        public static void DissconnectAllDevices() {
+            foreach(var device in DeviceDict.Values) {
+                device.Disconnect();
+            }
+            DeviceDict.Clear();
         }
 
         public static void Dispose() {

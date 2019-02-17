@@ -20,6 +20,8 @@ namespace IMUObserverCore.BLE {
         public GattDeviceServicesResult GattServices { private set; get; }
         public Dictionary<string, GattDeviceService> GattServiceDict { private set; get; }
 
+        private bool connected;
+        private Subject<Unit> deviceLostSubject;
         private Subject<byte[]> buttonSubject;
 
         public IMUDevice(IGattDevice gattDevice) {
@@ -28,13 +30,15 @@ namespace IMUObserverCore.BLE {
             GattServices = gattDevice.GattServices;
             GattServiceDict = gattDevice.GattServiceDict;
             buttonSubject = new Subject<byte[]>();
+            deviceLostSubject = new Subject<Unit>();
+            connected = false;
         }
 
-        public async Task<IMUDevice> LoadAsync() {
+        public async Task<IIMUNotifyDevice> ConnectionAsync() {
             // button operation
             if (GattServiceDict.ContainsKey(Profiles.Services.Button)) {
-                var sevice = GattServiceDict[Profiles.Services.Button];
-                var characteristics = await sevice.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
+                var service = GattServiceDict[Profiles.Services.Button];
+                var characteristics = await service.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
                 var characteristic = characteristics.Characteristics.FirstOrDefault();
                 if (characteristic == null) {
                     throw new BLEException($"characteristic({Profiles.Characteristics.ButtonOperation}) not found");
@@ -49,7 +53,21 @@ namespace IMUObserverCore.BLE {
                 }
                 characteristic.ValueChanged += OnButtonNotify;
             }
+            connected = true;
+            // monitor connection
+            Device.ConnectionStatusChanged += (device, _) => {
+                if (connected && device.ConnectionStatus == BluetoothConnectionStatus.Disconnected) {
+                    connected = false;
+                    deviceLostSubject.OnNext(Unit.Default);
+                    deviceLostSubject.OnCompleted();
+                }
+            };
             return this;
+        }
+
+        public void Disconnect() {
+            connected = false;
+            Dispose();
         }
 
         private void OnButtonNotify(GattCharacteristic c, GattValueChangedEventArgs arg) {
@@ -61,6 +79,8 @@ namespace IMUObserverCore.BLE {
         }
 
         public IObservable<byte[]> ButtonUpdateObservable() { return buttonSubject.AsObservable(); }
+
+        public IObservable<Unit> ConnectionLostObservable() { return deviceLostSubject.AsObservable(); }
 
         public void Dispose() {
             buttonSubject.Dispose();
