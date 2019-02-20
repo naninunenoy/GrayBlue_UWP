@@ -55,6 +55,32 @@ namespace IMUObserverCore {
                           notifyDelegate?.OnButtonRelease(deviceId, name.ToString(), time);
                       }
                   });
+            device.IMUUpdateObservable()
+                  .Subscribe(data => {
+                      var acc = new float[3] {
+                          BitConverter.ToSingle(data, 0),
+                          BitConverter.ToSingle(data, 4),
+                          BitConverter.ToSingle(data, 8)
+                      };
+                      var gyro = new float[3] {
+                          BitConverter.ToSingle(data, 12),
+                          BitConverter.ToSingle(data, 16),
+                          BitConverter.ToSingle(data, 20)
+                      };
+                      var mag = new float[3] {
+                          BitConverter.ToSingle(data, 24),
+                          BitConverter.ToSingle(data, 28),
+                          BitConverter.ToSingle(data, 32)
+                      };
+                      var quat = new float[4] {
+                          BitConverter.ToSingle(data, 36),
+                          BitConverter.ToSingle(data, 40),
+                          BitConverter.ToSingle(data, 44),
+                          BitConverter.ToSingle(data, 48)
+                      };
+                      Debug.WriteLine($"{quat[0]}, {quat[1]}, {quat[2]}, {quat[3]}");
+                      notifyDelegate?.OnIMUDataUpdate(deviceId, acc, gyro, mag, quat);
+                  });
             connectionDelegate?.OnConnectDone(deviceId);
             if (DeviceDict.ContainsKey(deviceId)) {
                 // overwrite

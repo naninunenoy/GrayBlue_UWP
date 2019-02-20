@@ -20,6 +20,7 @@ namespace IMUObserverCore.BLE {
         private bool connected;
         private Subject<Unit> deviceLostSubject;
         private Subject<byte[]> buttonSubject;
+        private Subject<byte[]> imuSubject;
 
         public IMUDevice(string deviceId) {
             DeviceId = deviceId;
@@ -54,12 +55,13 @@ namespace IMUObserverCore.BLE {
                 var characteristics = await service.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
                 var characteristic = characteristics.Characteristics.FirstOrDefault();
                 if (characteristic == null) {
-                    throw new BLEException($"characteristic({Profiles.Characteristics.ButtonOperation}) not found");
+                    throw new BLEException("Button Operation characteristic not found");
                 }
                 if (!characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify)) {
-                    throw new BLEException($"characteristic({Profiles.Characteristics.ButtonOperation}) has no Notify flag");
+                    throw new BLEException("Button Operation characteristic has no Notify flag");
                 }
-                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+                    GattClientCharacteristicConfigurationDescriptorValue.Notify);
                 if (status != GattCommunicationStatus.Success) {
                     throw new GattConnectionException("Button Operation GattCommunicationStatus is failed");
                 }
@@ -67,13 +69,38 @@ namespace IMUObserverCore.BLE {
                     if (c.Uuid == Profiles.Characteristics.ButtonOperation) {
                         var data = new byte[arg.CharacteristicValue.Length];
                         DataReader.FromBuffer(arg.CharacteristicValue).ReadBytes(data);
-                        buttonSubject.OnNext(data);
+                        buttonSubject?.OnNext(data);
+                    }
+                };
+            }
+            // IMU data service
+            if (allServices.ContainsKey(Profiles.Services.NineAxis)) {
+                var service = allServices[Profiles.Services.NineAxis];
+                var characteristics = await service.GetCharacteristicsForUuidAsync(Profiles.Characteristics.NineAxisIMUData);
+                var characteristic = characteristics.Characteristics.FirstOrDefault();
+                if (characteristic == null) {
+                    throw new BLEException("IMU Data characteristic not found");
+                }
+                if (!characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify)) {
+                    throw new BLEException("IMU Data characteristic has no Notify flag");
+                }
+                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+                        GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                if (status != GattCommunicationStatus.Success) {
+                    throw new GattConnectionException("IMU Data GattCommunicationStatus is failed");
+                }
+                characteristic.ValueChanged += (c, arg) => {
+                    if (c.Uuid == Profiles.Characteristics.NineAxisIMUData) {
+                        var data = new byte[arg.CharacteristicValue.Length];
+                        DataReader.FromBuffer(arg.CharacteristicValue).ReadBytes(data);
+                        imuSubject?.OnNext(data);
                     }
                 };
             }
             // connection complete
             deviceLostSubject = new Subject<Unit>();
             buttonSubject = new Subject<byte[]>();
+            imuSubject = new Subject<byte[]>();
             return this;
         }
 
@@ -86,10 +113,12 @@ namespace IMUObserverCore.BLE {
 
         public IObservable<Unit> ConnectionLostObservable() { return deviceLostSubject?.AsObservable(); }
         public IObservable<byte[]> ButtonUpdateObservable() { return buttonSubject?.AsObservable(); }
+        public IObservable<byte[]> IMUUpdateObservable() { return imuSubject?.AsObservable(); }
 
         public void Dispose() {
             deviceLostSubject?.Dispose();
             buttonSubject?.Dispose();
+            imuSubject?.Dispose();
             Device?.Dispose();
         }
     }

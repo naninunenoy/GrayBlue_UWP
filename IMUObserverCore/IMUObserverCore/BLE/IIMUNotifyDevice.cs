@@ -11,5 +11,6 @@ namespace IMUObserverCore.BLE {
         void Disconnect();
         IObservable<Unit> ConnectionLostObservable();
         IObservable<byte[]> ButtonUpdateObservable();
+        IObservable<byte[]> IMUUpdateObservable();
     }
 }
