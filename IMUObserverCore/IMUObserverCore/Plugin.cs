@@ -48,7 +48,6 @@ namespace IMUObserverCore {
                       char name = (char)data[1];
                       short ms = (short)((data[3] << 8) + data[2]);
                       float time = ms / 1000.0F;
-                      Debug.WriteLine($"p={press},c={name},t={time}");
                       if (press) {
                           notifyDelegate?.OnButtonPush(deviceId, name.ToString());
                       } else {
@@ -78,7 +77,6 @@ namespace IMUObserverCore {
                           BitConverter.ToSingle(data, 44),
                           BitConverter.ToSingle(data, 48)
                       };
-                      Debug.WriteLine($"{quat[0]}, {quat[1]}, {quat[2]}, {quat[3]}");
                       notifyDelegate?.OnIMUDataUpdate(deviceId, acc, gyro, mag, quat);
                   });
             connectionDelegate?.OnConnectDone(deviceId);
