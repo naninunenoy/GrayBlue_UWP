@@ -41,6 +41,10 @@ namespace IMUObserverApp {
             });
         }
 
+        public void OnIMUDataUpdate(string deviceId, float[] acc, float[] gyro, float[] mag, float[] quat) {
+            // Do Nothing
+        }
+
         public void OnButtonPush(string deviceId, string buttonName) {
             Debug.WriteLine($"push {buttonName} {deviceId}");
         }
