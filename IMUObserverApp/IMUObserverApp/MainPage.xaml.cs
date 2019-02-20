@@ -35,30 +35,30 @@ namespace IMUObserverApp {
                 var result = await blescan;
                 Debug.WriteLine($"found {result.Length} devices. {string.Join(",", result)}");
                 if (result.Length > 0) {
-                    var uuid = result[0];
-                    Core.Plugin.ConnectTo(uuid, this, this);
+                    var deviceId = result[0];
+                    Core.Plugin.ConnectTo(deviceId, this, this);
                 }
             });
         }
 
-        public void OnButtonPush(string uuid, string buttonName) {
-            Debug.WriteLine($"push {buttonName} {uuid}");
+        public void OnButtonPush(string deviceId, string buttonName) {
+            Debug.WriteLine($"push {buttonName} {deviceId}");
         }
 
-        public void OnButtonRelease(string uuid, string buttonName, float pressTime) {
-            Debug.WriteLine($"release {buttonName} {pressTime} {uuid}");
+        public void OnButtonRelease(string deviceId, string buttonName, float pressTime) {
+            Debug.WriteLine($"release {buttonName} {pressTime} {deviceId}");
         }
 
-        public void OnConnectDone(string uuid) {
-            //throw new NotImplementedException();
+        public void OnConnectDone(string deviceId) {
+            Debug.WriteLine($"OnConnectDone {deviceId}");
         }
 
-        public void OnConnectLost(string uuid) {
-            //throw new NotImplementedException();
+        public void OnConnectFail(string deviceId) {
+            Debug.WriteLine($"OnConnectFail {deviceId}");
         }
 
-        public void OnConnectTimeout(string uuid) {
-            //throw new NotImplementedException();
+        public void OnConnectLost(string deviceId) {
+            Debug.WriteLine($"OnConnectLost {deviceId}");
         }
     }
 }
