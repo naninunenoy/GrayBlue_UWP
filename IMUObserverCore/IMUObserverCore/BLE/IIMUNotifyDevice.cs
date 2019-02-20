@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Reactive;
 
 namespace IMUObserverCore.BLE {
-    internal interface IIMUNotifyDevice : IGattDevice {
+    internal interface IIMUNotifyDevice : IDisposable {
+        string Name { get; }
+        string DeviceId { get; }
         Task<IIMUNotifyDevice> ConnectionAsync();
         void Disconnect();
-        IObservable<byte[]> ButtonUpdateObservable();
         IObservable<Unit> ConnectionLostObservable();
+        IObservable<byte[]> ButtonUpdateObservable();
     }
 }

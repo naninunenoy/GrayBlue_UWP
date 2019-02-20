@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using System.Threading.Tasks;
 
 namespace IMUObserverCore.BLE {
-    internal interface IGattDevice : IDisposable {
-        BluetoothLEDevice Device { get; }
+    internal interface IGattDevice {
         string Name { get; }
-        string UUID { get; }
         ulong Address { get; }
-        GattDeviceServicesResult GattServices { get; }
-        Dictionary<string, GattDeviceService> GattServiceDict { get; }
+        string DeviceId { get; }
+        Task<string> GetDeviceIdAsync();
     }
 }
