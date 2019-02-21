@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 namespace IMUObserverCore {
     public static class Plugin {
         static BLE.IAdvertiseObserver advertiseObserver;
-        static IDictionary<string, BLE.IIMUNotifyDevice> DeviceDict;
+        static IDictionary<string, BLE.IIMUNotifyDevice> deviceDict;
 
         static Plugin() {
             advertiseObserver = new BLE.AdvertiseObserver();
-            DeviceDict = new Dictionary<string, BLE.IIMUNotifyDevice>();
+            deviceDict = new Dictionary<string, BLE.IIMUNotifyDevice>();
+        }
+
+        public static async Task<bool> CanUseBle() {
+            return await BLE.BLEAvailable.ChackAsync();
         }
 
         public static async Task<string[]> Scan() {
@@ -44,9 +48,9 @@ namespace IMUObserverCore {
                   .Subscribe(_ => { connectionDelegate?.OnConnectLost(deviceId); });
             device.ButtonUpdateObservable()
                   .Subscribe(data => {
-                      bool press = (data[0] != 0);
+                      bool press = BitConverter.ToBoolean(data, 0);
                       char name = (char)data[1];
-                      short ms = (short)((data[3] << 8) + data[2]);
+                      short ms = BitConverter.ToInt16(data, 2);
                       float time = ms / 1000.0F;
                       if (press) {
                           notifyDelegate?.OnButtonPush(deviceId, name.ToString());
@@ -80,38 +84,38 @@ namespace IMUObserverCore {
                       notifyDelegate?.OnIMUDataUpdate(deviceId, acc, gyro, mag, quat);
                   });
             connectionDelegate?.OnConnectDone(deviceId);
-            if (DeviceDict.ContainsKey(deviceId)) {
+            if (deviceDict.ContainsKey(deviceId)) {
                 // overwrite
-                DeviceDict[deviceId].Dispose();
-                DeviceDict[deviceId] = device;
+                deviceDict[deviceId].Dispose();
+                deviceDict[deviceId] = device;
             } else {
-                DeviceDict.Add(deviceId, device);
+                deviceDict.Add(deviceId, device);
             }
             return true;
         }
 
         public static void DisconnectTo(string deviceId) {
-            if (!DeviceDict.ContainsKey(deviceId)) {
+            if (!deviceDict.ContainsKey(deviceId)) {
                 Debug.Fail($"{deviceId} is not exist");
                 return;
             }
-            DeviceDict[deviceId].Disconnect();
-            DeviceDict.Remove(deviceId);
+            deviceDict[deviceId].Disconnect();
+            deviceDict.Remove(deviceId);
         }
 
         public static void DisconnectAllDevices() {
-            foreach(var device in DeviceDict.Values) {
+            foreach(var device in deviceDict.Values) {
                 device.Disconnect();
             }
-            DeviceDict.Clear();
+            deviceDict.Clear();
         }
 
         public static void Dispose() {
-            foreach (var device in DeviceDict.Values) {
+            foreach (var device in deviceDict.Values) {
                 device.Dispose();
             }
             advertiseObserver.Dispose();
-            DeviceDict.Clear();
+            deviceDict.Clear();
         }
     }
 }
