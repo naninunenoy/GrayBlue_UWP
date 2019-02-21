@@ -27,30 +27,37 @@ namespace IMUObserverApp {
 
         public MainPage() {
             this.InitializeComponent();
-            Debug.WriteLine("MainPage");
-
-            var blescan = Core.Plugin.Scan();
 
             Task.Run(async () => {
-                var result = await blescan;
-                Debug.WriteLine($"found {result.Length} devices. {string.Join(",", result)}");
-                if (result.Length > 0) {
-                    var deviceId = result[0];
-                    Core.Plugin.ConnectTo(deviceId, this, this);
+                var canUse = await Core.Plugin.CanUseBle();
+                if (canUse) {
+                    Debug.WriteLine("BLE Available!");
+                    var deviceIds = await Core.Plugin.Scan();
+                    Debug.WriteLine($"found {deviceIds.Length} devices. {string.Join(",", deviceIds)}");
+                    if (deviceIds.Length > 0) {
+                        var deviceId = deviceIds[0];
+                        Core.Plugin.ConnectTo(deviceId, this, this);
+                    }
+                } else {
+                    Debug.WriteLine("BLE Unavailable..");
                 }
             });
         }
 
         public void OnIMUDataUpdate(string deviceId, float[] acc, float[] gyro, float[] mag, float[] quat) {
-            // Do Nothing
+            Debug.WriteLine($"OnIMUDataUpdate {deviceId}");
+            Debug.WriteLine($"  Acc({string.Join(", ", acc.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($" Gyro({string.Join(", ", gyro.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($"  Mag({string.Join(", ", mag.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($" Quat({string.Join(", ", quat.Select(x => x.To3FixString()))})");
         }
 
         public void OnButtonPush(string deviceId, string buttonName) {
-            Debug.WriteLine($"push {buttonName} {deviceId}");
+            Debug.WriteLine($"OnButtonPush {buttonName} {deviceId}");
         }
 
         public void OnButtonRelease(string deviceId, string buttonName, float pressTime) {
-            Debug.WriteLine($"release {buttonName} {pressTime} {deviceId}");
+            Debug.WriteLine($"OnButtonRelease {buttonName} {pressTime} {deviceId}");
         }
 
         public void OnConnectDone(string deviceId) {
@@ -63,6 +70,23 @@ namespace IMUObserverApp {
 
         public void OnConnectLost(string deviceId) {
             Debug.WriteLine($"OnConnectLost {deviceId}");
+        }
+    }
+
+    static class FloatStringEx {
+        public static string To3FixString(this float x) {
+            int seisu = (int)x;
+            float shosu = x - seisu;
+            if (Math.Abs(x) > 1000.0F) {
+                seisu = x > 0.0F ? 999 : -999;
+                shosu = 0.0F;
+            }
+            bool negative = (seisu < 0) || (seisu == 0 && shosu < 0.0F);
+            seisu = Math.Abs(seisu);
+            shosu = Math.Abs(shosu);
+            return $"{(negative ? "-" : " ")}" +
+                $"{seisu.ToString().PadLeft(3, ' ')}" +
+                $"{shosu.ToString("F3").TrimStart('0')}";
         }
     }
 }
