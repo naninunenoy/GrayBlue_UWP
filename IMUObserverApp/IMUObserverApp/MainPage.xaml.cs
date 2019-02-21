@@ -46,10 +46,11 @@ namespace IMUObserverApp {
 
         public void OnIMUDataUpdate(string deviceId, float[] acc, float[] gyro, float[] mag, float[] quat) {
             Debug.WriteLine($"OnIMUDataUpdate {deviceId}");
-            Debug.WriteLine($"  Acc({string.Join(", ", acc.Select(x => x.To3FixString()))})");
-            Debug.WriteLine($" Gyro({string.Join(", ", gyro.Select(x => x.To3FixString()))})");
-            Debug.WriteLine($"  Mag({string.Join(", ", mag.Select(x => x.To3FixString()))})");
-            Debug.WriteLine($" Quat({string.Join(", ", quat.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($" Time=({DateTime.Now.ToString("HH:mm:ss.fffff")})");
+            Debug.WriteLine($"  Acc=({string.Join(", ", acc.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($" Gyro=({string.Join(", ", gyro.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($"  Mag=({string.Join(", ", mag.Select(x => x.To3FixString()))})");
+            Debug.WriteLine($" Quat=({string.Join(", ", quat.Select(x => x.To3FixString()))})");
         }
 
         public void OnButtonPush(string deviceId, string buttonName) {
@@ -75,18 +76,9 @@ namespace IMUObserverApp {
 
     static class FloatStringEx {
         public static string To3FixString(this float x) {
-            int seisu = (int)x;
-            float shosu = x - seisu;
-            if (Math.Abs(x) > 1000.0F) {
-                seisu = x > 0.0F ? 999 : -999;
-                shosu = 0.0F;
-            }
-            bool negative = (seisu < 0) || (seisu == 0 && shosu < 0.0F);
-            seisu = Math.Abs(seisu);
-            shosu = Math.Abs(shosu);
-            return $"{(negative ? "-" : " ")}" +
-                $"{seisu.ToString().PadLeft(3, ' ')}" +
-                $"{shosu.ToString("F3").TrimStart('0')}";
+            x = Math.Min(9999.999F, x);
+            x = Math.Max(x, -9999.999F);
+            return x.ToString("F3").PadLeft(9, ' ');
         }
     }
 }
