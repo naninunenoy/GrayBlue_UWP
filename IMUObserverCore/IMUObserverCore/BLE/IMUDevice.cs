@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -51,51 +52,23 @@ namespace IMUObserverCore.BLE {
             var allServices = gatt.Services.ToDictionary(x => x.Uuid);
             // button operation service
             if (allServices.ContainsKey(Profiles.Services.Button)) {
-                var service = allServices[Profiles.Services.Button];
-                var characteristics = await service.GetCharacteristicsForUuidAsync(Profiles.Characteristics.ButtonOperation);
-                var characteristic = characteristics.Characteristics.FirstOrDefault();
-                if (characteristic == null) {
-                    throw new BLEException("Button Operation characteristic not found");
+                IObservable<byte[]> notify;
+                try {
+                    notify = await allServices[Profiles.Services.Button].GetCharacteristicsNotifyOf(Profiles.Characteristics.ButtonOperation);
+                } catch (BLEException e) {
+                    throw new BLEException($"{e.Message} (Button)", e);
                 }
-                if (!characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify)) {
-                    throw new BLEException("Button Operation characteristic has no Notify flag");
-                }
-                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-                    GattClientCharacteristicConfigurationDescriptorValue.Notify);
-                if (status != GattCommunicationStatus.Success) {
-                    throw new GattConnectionException("Button Operation GattCommunicationStatus is failed");
-                }
-                characteristic.ValueChanged += (c, arg) => {
-                    if (c.Uuid == Profiles.Characteristics.ButtonOperation) {
-                        var data = new byte[arg.CharacteristicValue.Length];
-                        DataReader.FromBuffer(arg.CharacteristicValue).ReadBytes(data);
-                        buttonSubject?.OnNext(data);
-                    }
-                };
+                notify?.Subscribe(x => { buttonSubject?.OnNext(x); });
             }
             // IMU data service
             if (allServices.ContainsKey(Profiles.Services.NineAxis)) {
-                var service = allServices[Profiles.Services.NineAxis];
-                var characteristics = await service.GetCharacteristicsForUuidAsync(Profiles.Characteristics.NineAxisIMUData);
-                var characteristic = characteristics.Characteristics.FirstOrDefault();
-                if (characteristic == null) {
-                    throw new BLEException("IMU Data characteristic not found");
+                IObservable<byte[]> notify;
+                try {
+                    notify = await allServices[Profiles.Services.NineAxis].GetCharacteristicsNotifyOf(Profiles.Characteristics.NineAxisIMUData);
+                } catch (BLEException e) {
+                    throw new BLEException($"{e.Message} (IMU)", e);
                 }
-                if (!characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify)) {
-                    throw new BLEException("IMU Data characteristic has no Notify flag");
-                }
-                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-                        GattClientCharacteristicConfigurationDescriptorValue.Notify);
-                if (status != GattCommunicationStatus.Success) {
-                    throw new GattConnectionException("IMU Data GattCommunicationStatus is failed");
-                }
-                characteristic.ValueChanged += (c, arg) => {
-                    if (c.Uuid == Profiles.Characteristics.NineAxisIMUData) {
-                        var data = new byte[arg.CharacteristicValue.Length];
-                        DataReader.FromBuffer(arg.CharacteristicValue).ReadBytes(data);
-                        imuSubject?.OnNext(data);
-                    }
-                };
+                notify?.Subscribe(x => { imuSubject?.OnNext(x); });
             }
             // connection complete
             deviceLostSubject = new Subject<Unit>();
@@ -120,6 +93,35 @@ namespace IMUObserverCore.BLE {
             buttonSubject?.Dispose();
             imuSubject?.Dispose();
             Device?.Dispose();
+        }
+    }
+    
+    internal static class BleServiceGuidExtension {
+        public static async Task<IObservable<byte[]>> GetCharacteristicsNotifyOf(this GattDeviceService service, Guid of) {
+            var characteristics = await service.GetCharacteristicsForUuidAsync(of);
+            var characteristic = characteristics.Characteristics.FirstOrDefault();
+            if (characteristic == null) {
+                throw new BLEException("Characteristic not found.");
+            }
+            if (!characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify)) {
+                throw new BLEException("characteristic has no Notify flag.");
+            }
+            var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+                    GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            if (status != GattCommunicationStatus.Success) {
+                throw new BLEException("GattCommunicationStatus is failed.");
+            }
+            return Observable.FromEventPattern<
+                TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs>,
+                GattCharacteristic, GattValueChangedEventArgs>(
+                    h => characteristic.ValueChanged += h,
+                    h => characteristic.ValueChanged -= h)
+                .Select(x => x.EventArgs)
+                .Select(x => {
+                    var data = new byte[x.CharacteristicValue.Length];
+                    DataReader.FromBuffer(x.CharacteristicValue).ReadBytes(data);
+                    return data;
+                });
         }
     }
 }
