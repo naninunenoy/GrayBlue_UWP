@@ -29,14 +29,14 @@ namespace IMUObserverApp {
             this.InitializeComponent();
 
             Task.Run(async () => {
-                var canUse = await Core.Plugin.CanUseBle();
+                var canUse = await Core.Plugin.Instance.CanUseBle();
                 if (canUse) {
                     Debug.WriteLine("BLE Available!");
-                    var deviceIds = await Core.Plugin.Scan();
+                    var deviceIds = await Core.Plugin.Instance.Scan();
                     Debug.WriteLine($"found {deviceIds.Length} devices. {string.Join(",", deviceIds)}");
                     if (deviceIds.Length > 0) {
                         var deviceId = deviceIds[0];
-                        Core.Plugin.ConnectTo(deviceId, this, this);
+                        Core.Plugin.Instance.ConnectTo(deviceId, this, this);
                     }
                 } else {
                     Debug.WriteLine("BLE Unavailable..");
