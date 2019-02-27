@@ -6,20 +6,36 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace IMUObserverCore {
-    public static class Plugin {
-        static BLE.IAdvertiseObserver advertiseObserver;
-        static IDictionary<string, BLE.IIMUNotifyDevice> deviceDict;
+    public class Plugin : IPlugin {
+        static Plugin instance;
+        static readonly object lockObj = new object();
 
-        static Plugin() {
+        BLE.IAdvertiseObserver advertiseObserver;
+        IDictionary<string, BLE.IIMUNotifyDevice> deviceDict;
+
+        private Plugin() {
             advertiseObserver = new BLE.AdvertiseObserver();
             deviceDict = new Dictionary<string, BLE.IIMUNotifyDevice>();
         }
 
-        public static async Task<bool> CanUseBle() {
+        public static Plugin Instance {
+            get {
+                if (instance == null) {
+                    lock (lockObj) {
+                        if (instance == null) {
+                            instance = new Plugin();
+                        }
+                    }
+                }
+                return instance;
+            }
+        }
+
+        public async Task<bool> CanUseBle() {
             return await BLE.BLEAvailable.ChackAsync();
         }
 
-        public static async Task<string[]> Scan() {
+        public async Task<string[]> Scan() {
             // scan devices
             Debug.WriteLine("scanning..");
             var devices = await advertiseObserver.ScanAdvertiseDevicesAsync();
@@ -34,7 +50,7 @@ namespace IMUObserverCore {
             return deviceIds.ToArray();
         }
 
-        public static async Task<bool> ConnectTo(string deviceId, IConnectionDelegate connectionDelegate, INotifyDelegate notifyDelegate) {
+        public async Task<bool> ConnectTo(string deviceId, IConnectionDelegate connectionDelegate, INotifyDelegate notifyDelegate) {
             BLE.IIMUNotifyDevice device = new BLE.IMUDevice(deviceId);
             try {
                 device = await device.ConnectionAsync();
@@ -94,7 +110,7 @@ namespace IMUObserverCore {
             return true;
         }
 
-        public static void DisconnectTo(string deviceId) {
+        public void DisconnectTo(string deviceId) {
             if (!deviceDict.ContainsKey(deviceId)) {
                 Debug.Fail($"{deviceId} is not exist");
                 return;
@@ -103,14 +119,14 @@ namespace IMUObserverCore {
             deviceDict.Remove(deviceId);
         }
 
-        public static void DisconnectAllDevices() {
+        public void DisconnectAllDevices() {
             foreach(var device in deviceDict.Values) {
                 device.Disconnect();
             }
             deviceDict.Clear();
         }
 
-        public static void Dispose() {
+        public void Dispose() {
             foreach (var device in deviceDict.Values) {
                 device.Dispose();
             }

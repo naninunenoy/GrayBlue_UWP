@@ -2,8 +2,8 @@ using System;
 
 namespace IMUObserverCore {
     public interface IConnectionDelegate {
-        void OnConnectDone(string uuid);
-        void OnConnectFail(string uuid);
-        void OnConnectLost(string uuid);
+        void OnConnectDone(string deviceId);
+        void OnConnectFail(string deviceId);
+        void OnConnectLost(string deviceId);
     }
 }
