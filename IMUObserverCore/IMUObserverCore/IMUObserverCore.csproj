@@ -122,6 +122,15 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\IConnectionDelegate.cs">
+      <Link>IConnectionDelegate.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\INotifyDelegate.cs">
+      <Link>INotifyDelegate.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\IPlugin.cs">
+      <Link>IPlugin.cs</Link>
+    </Compile>
     <Compile Include="BLE\AdvertiseObserver.cs" />
     <Compile Include="BLE\BLEAvailable.cs" />
     <Compile Include="BLE\BLEException.cs" />
@@ -131,8 +140,6 @@
     <Compile Include="BLE\IIMUNotifyDevice.cs" />
     <Compile Include="BLE\IMUDevice.cs" />
     <Compile Include="BLE\Profiles.cs" />
-    <Compile Include="IConnectionDelegate.cs" />
-    <Compile Include="INotifyDelegate.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\IMUObserverCore.rd.xml" />
