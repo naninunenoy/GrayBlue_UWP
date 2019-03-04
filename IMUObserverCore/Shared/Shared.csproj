@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D57274B1-67BB-448A-BC7F-7A6A64E0E545}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Shared</RootNamespace>
-    <AssemblyName>Shared</AssemblyName>
+    <RootNamespace>IMUObserverCore</RootNamespace>
+    <AssemblyName>IMUObserverCore</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
