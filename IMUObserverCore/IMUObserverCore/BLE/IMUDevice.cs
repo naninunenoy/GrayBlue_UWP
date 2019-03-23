@@ -95,7 +95,7 @@ namespace IMUObserverCore.BLE {
             Device?.Dispose();
         }
     }
-    
+
     internal static class BleServiceGuidExtension {
         public static async Task<IObservable<byte[]>> GetCharacteristicsNotifyOf(this GattDeviceService service, Guid of) {
             var characteristics = await service.GetCharacteristicsForUuidAsync(of);

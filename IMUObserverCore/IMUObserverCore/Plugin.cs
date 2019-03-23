@@ -120,7 +120,7 @@ namespace IMUObserverCore {
         }
 
         public void DisconnectAllDevices() {
-            foreach(var device in deviceDict.Values) {
+            foreach (var device in deviceDict.Values) {
                 device.Disconnect();
             }
             deviceDict.Clear();
