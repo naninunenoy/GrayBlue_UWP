@@ -7,8 +7,8 @@
     <ProjectGuid>{5F55BA4A-6025-4DDC-9C0C-CD2FB5B29F9C}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IMUObserverApp</RootNamespace>
-    <AssemblyName>IMUObserverApp</AssemblyName>
+    <RootNamespace>GrayBlue_UWP_App</RootNamespace>
+    <AssemblyName>GrayBlue_UWP_App</AssemblyName>
     <DefaultLanguage>ja-JP</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
