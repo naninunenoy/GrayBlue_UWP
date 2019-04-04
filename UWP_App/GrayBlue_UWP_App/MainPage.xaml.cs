@@ -19,7 +19,7 @@ using Windows.UI.Xaml.Navigation;
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
 namespace IMUObserverApp {
-    using Core = IMUObserverCore;
+    using Core = GrayBlueUWPCore;
     /// <summary>
     /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
     /// </summary>
@@ -45,7 +45,6 @@ namespace IMUObserverApp {
         }
 
         public void OnIMUDataUpdate(string deviceId, float[] acc, float[] gyro, float[] mag, float[] quat) {
-            return;
             Debug.WriteLine($"OnIMUDataUpdate {deviceId}");
             Debug.WriteLine($" Time=({DateTime.Now.ToString("HH:mm:ss.fffff")})");
             Debug.WriteLine($"  Acc=({string.Join(", ", acc.Select(x => x.To3FixString()))})");
