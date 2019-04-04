@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrayBlue_UWP_App", "IMUObserverApp\GrayBlue_UWP_App.csproj", "{5F55BA4A-6025-4DDC-9C0C-CD2FB5B29F9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrayBlue_UWP_App", "GrayBlue_UWP_App\GrayBlue_UWP_App.csproj", "{5F55BA4A-6025-4DDC-9C0C-CD2FB5B29F9C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5FC7D4D0-5DCA-4F31-8B22-EE939FA272B6}"
 	ProjectSection(SolutionItems) = preProject
