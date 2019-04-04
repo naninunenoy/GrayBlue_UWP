@@ -45,6 +45,7 @@ namespace IMUObserverApp {
         }
 
         public void OnIMUDataUpdate(string deviceId, float[] acc, float[] gyro, float[] mag, float[] quat) {
+            return;
             Debug.WriteLine($"OnIMUDataUpdate {deviceId}");
             Debug.WriteLine($" Time=({DateTime.Now.ToString("HH:mm:ss.fffff")})");
             Debug.WriteLine($"  Acc=({string.Join(", ", acc.Select(x => x.To3FixString()))})");
