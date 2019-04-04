@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal interface IGattDevice {
         string Name { get; }
         ulong Address { get; }

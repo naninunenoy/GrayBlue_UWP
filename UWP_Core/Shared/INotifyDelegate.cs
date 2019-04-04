@@ -1,6 +1,6 @@
 using System;
 
-namespace IMUObserverCore {
+namespace GrayBlueUWPCore {
     public interface INotifyDelegate {
         void OnButtonPush(string deviceId, string buttonName);
         void OnButtonRelease(string deviceId, string buttonName, float pressTime);

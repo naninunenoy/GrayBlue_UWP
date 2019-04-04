@@ -12,7 +12,7 @@ using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal class IMUDevice : IIMUNotifyDevice {
         public string Name { get => Device?.Name ?? "???"; }
         public string DeviceId { private set; get; }

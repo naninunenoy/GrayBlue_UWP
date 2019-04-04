@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace IMUObserverCore {
+namespace GrayBlueUWPCore {
     public interface IPlugin {
         Task<bool> CanUseBle();
         Task<string[]> Scan();

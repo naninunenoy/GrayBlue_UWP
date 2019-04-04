@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     class BLEException : Exception {
         public BLEException() { }
         public BLEException(string message) : base(message) { }

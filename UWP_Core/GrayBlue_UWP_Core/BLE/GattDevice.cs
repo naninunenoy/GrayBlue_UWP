@@ -6,7 +6,7 @@ using System.Linq;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal class GattDevice : IGattDevice {
         public string Name { private set; get; }
         public ulong Address { private set; get; }

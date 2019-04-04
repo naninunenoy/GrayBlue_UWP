@@ -10,7 +10,7 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal class AdvertiseObserver : IAdvertiseObserver {
         static readonly TimeSpan interval = TimeSpan.FromSeconds(1);
         static readonly TimeSpan scanLength = TimeSpan.FromSeconds(3);

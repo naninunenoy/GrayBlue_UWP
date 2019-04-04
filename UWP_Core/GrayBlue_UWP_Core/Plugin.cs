@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMUObserverCore {
+namespace GrayBlueUWPCore {
     public class Plugin : IPlugin {
         static Plugin instance;
         static readonly object lockObj = new object();

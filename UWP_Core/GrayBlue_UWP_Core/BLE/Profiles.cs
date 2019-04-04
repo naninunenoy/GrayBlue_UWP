@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal static class Profiles {
         public static class Services {
             const string button = "de4c3b20-26ea-11e9-ab14-d663bd873d93";

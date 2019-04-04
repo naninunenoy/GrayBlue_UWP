@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal interface IAdvertiseObserver : IDisposable {
         Task<IGattDevice[]> ScanAdvertiseDevicesAsync();
     }

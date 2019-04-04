@@ -1,6 +1,6 @@
 using System;
 
-namespace IMUObserverCore {
+namespace GrayBlueUWPCore {
     public interface IConnectionDelegate {
         void OnConnectDone(string deviceId);
         void OnConnectFail(string deviceId);

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Reactive;
 
-namespace IMUObserverCore.BLE {
+namespace GrayBlueUWPCore.BLE {
     internal interface IIMUNotifyDevice : IDisposable {
         string Name { get; }
         string DeviceId { get; }
