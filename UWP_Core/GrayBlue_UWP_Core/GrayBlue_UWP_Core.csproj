@@ -7,8 +7,8 @@
     <ProjectGuid>{DA0C9DF5-5B52-4740-A7C7-5060BFEBEE06}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IMUObserverCore</RootNamespace>
-    <AssemblyName>IMUObserverCore</AssemblyName>
+    <RootNamespace>GrayBlueUWPCore</RootNamespace>
+    <AssemblyName>GrayBlueUWPCore</AssemblyName>
     <DefaultLanguage>ja-JP</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
