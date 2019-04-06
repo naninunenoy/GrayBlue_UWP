@@ -3,7 +3,7 @@ GrayBlue_UWP
 
 <img src="https://github.com/naninunenoy/GrayBlue/blob/doc/doc/icon.png" width="200" />
 
-This is [GrayBlue](https://github.com/naninunenoy/GrayBlue) dll class libraryand example app for universal windows platform.
+This is [GrayBlue](https://github.com/naninunenoy/GrayBlue) dll class library and example app for universal windows platform.
 
 <img src="https://img.shields.io/badge/platform-windows(UWP)-lightGray.svg" /> 
 
@@ -23,7 +23,7 @@ Windows 10 (build 0.1506 and higher)
     - version: 4.1.2
 
 ## Licence
-MIT
+[MIT](https://github.com/naninunenoy/GrayBlue_UWP/blob/master/LICENSE)
 
 ## Author
 [@naninunenoy](https://github.com/naninunenoy)
